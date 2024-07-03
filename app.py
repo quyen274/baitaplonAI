@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
 
 def prepare_data(data, features):
     data_scaled = data.copy()
