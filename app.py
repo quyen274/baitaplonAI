@@ -5,7 +5,7 @@ import pickle
 import matplotlib.pyplot as plt
 
 # Đọc dữ liệu và tải mô hình
-data = pd.read_csv('_Dữ_liệu_giao_dịch_ngày__202406152152.csv')
+data = pd.read_csv('dulieuthunho.csv')
 data['Ngày'] = pd.to_datetime(data['Ngày'])
 data.drop(['Ghép 01', 'Ghép 02', 'Ngành nghề', 'Sàn'], axis=1, inplace=True)
 features = ['Mở cửa', 'Đóng cửa', 'Cao nhất', 'Thấp nhất', 'Trung bình', 'GD khớp lệnh KL']
@@ -43,8 +43,8 @@ for stock in data['Mã CK'].unique():
     profit = (predicted_price - current_price) / current_price
     profits[stock] = profit
 
-# Hiển thị 10 mã CK có lợi nhuận cao nhất
-sorted_profits = sorted(profits.items(), key=lambda x: x[1], reverse=True)[:10]
+# Hiển thị 3 mã CK có lợi nhuận cao nhất
+sorted_profits = sorted(profits.items(), key=lambda x: x[1], reverse=True)[:3]
 
 st.write('Top 10 stocks with highest predicted profit:')
 for stock, profit in sorted_profits:
