@@ -32,7 +32,7 @@ st.title('Stock Price Prediction and Profit Calculation')
 
 # Nhập số tiền đầu tư
 investment = st.number_input('Enter the investment amount:', min_value=0.0, value=1000.0, step=100.0)
-
+seq_length=20
 # Tính toán lợi nhuận
 profits = {}
 for stock in data['Mã CK'].unique():
