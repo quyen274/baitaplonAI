@@ -10,17 +10,6 @@ data['Ngày'] = pd.to_datetime(data['Ngày'])
 features = ['Mở cửa', 'Đóng cửa', 'Cao nhất', 'Thấp nhất', 'Trung bình', 'GD khớp lệnh KL']
 data = data[['Ngày', 'Mã CK'] + features]
 data = data.sort_values(by=['Mã CK', 'Ngày'])
-def prepare_data(data, features):
-    data_scaled = data.copy()
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    data_scaled[features] = scaler.fit_transform(data[features])
-    return data_scaled, scaler
-def create_sequences(data, seq_length, feature_col):
-    X, Y = [], []
-    for i in range(len(data) - seq_length):
-        X.append(data[i:i + seq_length])
-        Y.append(data[i + seq_length][feature_col])
-    return np.array(X), np.array(Y)
     
 with open('models.pkl', 'rb') as file:
     models = pickle.load(file)
