@@ -60,7 +60,7 @@ for stock in data['Mã CK'].unique():
 # Hiển thị 3 mã CK có lợi nhuận cao nhất
 sorted_profits = sorted(profits.items(), key=lambda x: x[1], reverse=True)[:3]
 
-st.write('Top 10 stocks with highest predicted profit:')
+st.write('Top 3 stocks with highest predicted profit:')
 for stock, profit in sorted_profits:
     st.write(f'{stock}: {profit:.2%}')
 
