@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 # Đọc dữ liệu và tải mô hình
 data = pd.read_csv('dulieuthunho.csv')
 data['Ngày'] = pd.to_datetime(data['Ngày'])
-data.drop(['Ghép 01', 'Ghép 02', 'Ngành nghề', 'Sàn'], axis=1, inplace=True)
 features = ['Mở cửa', 'Đóng cửa', 'Cao nhất', 'Thấp nhất', 'Trung bình', 'GD khớp lệnh KL']
 data = data[['Ngày', 'Mã CK'] + features]
 data = data.sort_values(by=['Mã CK', 'Ngày'])
