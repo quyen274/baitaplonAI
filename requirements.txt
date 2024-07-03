@@ -4,4 +4,3 @@ tensorflow
 matplotlib
 seaborn
 tqdm
-os
