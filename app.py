@@ -17,11 +17,7 @@ with open('models.pkl', 'rb') as file:
 with open('scalers.pkl', 'rb') as file:
     scalers = pickle.load(file)
     
-def prepare_data(data, features):
-    data_scaled = data.copy()
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    data_scaled[features] = scaler.fit_transform(data[features])
-    return data_scaled, scaler
+
 # Dự đoán giá đóng cửa tiếp theo
 def predict_next_close(stock_data, seq_length, model, features, scaler):
     last_sequence = stock_data[features].values[-seq_length:]
