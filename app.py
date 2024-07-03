@@ -4,6 +4,19 @@ import numpy as np
 import pickle
 import matplotlib.pyplot as plt
 
+def prepare_data(data, features):
+    data_scaled = data.copy()
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    data_scaled[features] = scaler.fit_transform(data[features])
+    return data_scaled, scaler
+
+def create_sequences(data, seq_length, feature_col):
+    X, Y = [], []
+    for i in range(len(data) - seq_length):
+        X.append(data[i:i + seq_length])
+        Y.append(data[i + seq_length][feature_col])
+    return np.array(X), np.array(Y)
+
 # Đọc dữ liệu và tải mô hình
 data = pd.read_csv('dulieuthunho.csv')
 data['Ngày'] = pd.to_datetime(data['Ngày'])
