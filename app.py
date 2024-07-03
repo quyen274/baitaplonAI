@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
-from train import prepare_data, create_sequences
 
 # Đọc dữ liệu và tải mô hình
 data = pd.read_csv('dulieuthunho.csv')
