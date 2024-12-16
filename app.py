@@ -21,29 +21,47 @@ with st.sidebar:
     )
 
 # Function for crawling data from Shopee
-def crawl_shopee(keyword="labubu", max_pages=1):
-    base_url = "https://shopee.vn/search?keyword=" + keyword
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-    }
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+import pandas as pd
+import time
 
+# Hàm crawl dữ liệu từ Shopee
+def crawl_shopee(keyword="labubu", max_pages=1):
+    options = Options()
+    options.add_argument("--headless")  # Chạy trình duyệt ở chế độ không hiển thị
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    service = Service("path/to/chromedriver")  # Thay đường dẫn tới chromedriver của bạn
+
+    driver = webdriver.Chrome(service=service, options=options)
     product_data = []
 
-    for page in range(max_pages):
-        url = f"{base_url}&page={page}"
-        response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.text, 'html.parser')
+    try:
+        for page in range(max_pages):
+            url = f"https://shopee.vn/search?keyword={keyword}&page={page}"
+            driver.get(url)
+            time.sleep(5)  # Chờ trang load xong
 
-        items = soup.find_all("div", class_="shopee-search-item-result__item")
-        for item in items:
-            try:
-                title = item.find("div", class_="_10Wbs- _5SSWfi UjjMrh").text
-                sales = item.find("div", class_="_2VIlt8").text if item.find("div", class_="_2VIlt8") else "0"
-                product_data.append({"Product": title, "Sales": sales})
-            except Exception as e:
-                continue
+            # Tìm tất cả các sản phẩm
+            items = driver.find_elements(By.CLASS_NAME, "shopee-search-item-result__item")
+            for item in items:
+                try:
+                    title = item.find_element(By.CLASS_NAME, "_1NoI8_._16BAGk").text
+                    sales = item.find_element(By.CLASS_NAME, "_18SLBt").text if item.find_elements(By.CLASS_NAME, "_18SLBt") else "0"
+                    product_data.append({"Product": title, "Sales": sales})
+                except Exception as e:
+                    continue
+    finally:
+        driver.quit()
 
     return pd.DataFrame(product_data)
+
+# Thử nghiệm hàm crawl
+data = crawl_shopee(keyword="labubu", max_pages=1)
+print(data)
 
 # Mock function for social media data
 def crawl_social_media(keyword="labubu", max_posts=50):
