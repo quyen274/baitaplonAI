@@ -4,12 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from streamlit_option_menu import option_menu
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-import time
-import os
 
 # Streamlit configuration
 st.set_page_config(page_title="Labubu Trend Analysis", layout="wide")
@@ -24,26 +23,25 @@ with st.sidebar:
         default_index=0,
     )
 
-# Function to crawl data from Shopee using Selenium
+# Function to crawl Shopee data with fallback
 def crawl_shopee(keyword="labubu", max_pages=1):
-    options = Options()
-    options.add_argument("--headless")  # Run in headless mode (no UI)
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    service = Service("/path/to/chromedriver")  # Update with the path to ChromeDriver
-
-    driver = webdriver.Chrome(service=service, options=options)
-    product_data = []
-
     try:
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        service = Service("/path/to/chromedriver")  # Replace with your actual chromedriver path
+
+        driver = webdriver.Chrome(service=service, options=options)
+        product_data = []
+
         for page in range(max_pages):
             url = f"https://shopee.vn/search?keyword={keyword}&page={page}"
             driver.get(url)
-            time.sleep(5)  # Wait for the page to load
-
-            # Locate product items
+            time.sleep(5)
             items = driver.find_elements(By.CLASS_NAME, "shopee-search-item-result__item")
+
             for item in items:
                 try:
                     title = item.find_element(By.CLASS_NAME, "_1NoI8_._16BAGk").text
@@ -51,10 +49,15 @@ def crawl_shopee(keyword="labubu", max_pages=1):
                     product_data.append({"Product": title, "Sales": sales})
                 except Exception as e:
                     continue
-    finally:
+
         driver.quit()
-    
-    return pd.DataFrame(product_data)
+        return pd.DataFrame(product_data)
+    except Exception as e:
+        st.warning("Không thể crawl dữ liệu Shopee. Chuyển sang dữ liệu mẫu.")
+        return pd.DataFrame({
+            "Product": ["Labubu Doll 1", "Labubu Doll 2", "Labubu Doll 3"],
+            "Sales": ["150 sold", "200 sold", "250 sold"]
+        })
 
 # Mock function for social media data (fallback)
 def crawl_social_media(keyword="labubu", max_posts=50):
@@ -76,11 +79,8 @@ if selected == "Crawl Dữ Liệu":
     if st.button("Crawl Shopee"):
         try:
             shopee_data = crawl_shopee(keyword, max_pages)
-            if not shopee_data.empty:
-                st.write(f"Kết quả crawl từ Shopee ({len(shopee_data)} sản phẩm):")
-                st.dataframe(shopee_data)
-            else:
-                st.warning("Không tìm thấy dữ liệu nào từ Shopee.")
+            st.write(f"Kết quả crawl từ Shopee ({len(shopee_data)} sản phẩm):")
+            st.dataframe(shopee_data)
         except Exception as e:
             st.error(f"Có lỗi xảy ra: {e}")
 
