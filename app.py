@@ -141,7 +141,7 @@ if selected == "Dự Đoán Xu Hướng":
         "Predicted Sales": sales_predictions.astype(int)
     })
 
-    st.subheader("📅 Dự Đoán Doanh Số Trong 5 Ngày Tiếp Theo")
+    st.subheader("📅 Dự Đoán Số Lượng Có Thế Bán Trong 5 Ngày Tiếp Theo")
     st.dataframe(predicted_data)
 
     # Plot predictions
