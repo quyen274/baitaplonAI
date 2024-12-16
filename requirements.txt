@@ -1,6 +1,9 @@
-scikit-learn
-keras 
-tensorflow
+streamlit
+pandas
+numpy
 matplotlib
-seaborn
-tqdm
+scikit-learn
+beautifulsoup4
+requests
+snscrape
+streamlit-option-menu
