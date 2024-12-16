@@ -4,8 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from streamlit_option_menu import option_menu
-import requests
-from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+import time
+import os
 
 # Streamlit configuration
 st.set_page_config(page_title="Labubu Trend Analysis", layout="wide")
@@ -20,21 +24,14 @@ with st.sidebar:
         default_index=0,
     )
 
-# Function for crawling data from Shopee
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-import pandas as pd
-import time
-
-# Hàm crawl dữ liệu từ Shopee
+# Function to crawl data from Shopee using Selenium
 def crawl_shopee(keyword="labubu", max_pages=1):
     options = Options()
-    options.add_argument("--headless")  # Chạy trình duyệt ở chế độ không hiển thị
+    options.add_argument("--headless")  # Run in headless mode (no UI)
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
-    service = Service("path/to/chromedriver")  # Thay đường dẫn tới chromedriver của bạn
+    options.add_argument("--disable-dev-shm-usage")
+    service = Service("/path/to/chromedriver")  # Update with the path to ChromeDriver
 
     driver = webdriver.Chrome(service=service, options=options)
     product_data = []
@@ -43,9 +40,9 @@ def crawl_shopee(keyword="labubu", max_pages=1):
         for page in range(max_pages):
             url = f"https://shopee.vn/search?keyword={keyword}&page={page}"
             driver.get(url)
-            time.sleep(5)  # Chờ trang load xong
+            time.sleep(5)  # Wait for the page to load
 
-            # Tìm tất cả các sản phẩm
+            # Locate product items
             items = driver.find_elements(By.CLASS_NAME, "shopee-search-item-result__item")
             for item in items:
                 try:
@@ -56,16 +53,11 @@ def crawl_shopee(keyword="labubu", max_pages=1):
                     continue
     finally:
         driver.quit()
-
+    
     return pd.DataFrame(product_data)
 
-# Thử nghiệm hàm crawl
-data = crawl_shopee(keyword="labubu", max_pages=1)
-print(data)
-
-# Mock function for social media data
+# Mock function for social media data (fallback)
 def crawl_social_media(keyword="labubu", max_posts=50):
-    # Return mock data for now
     return pd.DataFrame({
         "Post": ["Labubu is amazing!", "Best gift for kids!", "Limited Labubu stocks!"],
         "Likes": [150, 230, 300],
@@ -82,16 +74,25 @@ if selected == "Crawl Dữ Liệu":
     max_pages = st.slider("Số trang cần crawl:", 1, 5, 1)
 
     if st.button("Crawl Shopee"):
-        shopee_data = crawl_shopee(keyword, max_pages)
-        st.write(f"Kết quả crawl từ Shopee ({len(shopee_data)} sản phẩm):")
-        st.dataframe(shopee_data)
+        try:
+            shopee_data = crawl_shopee(keyword, max_pages)
+            if not shopee_data.empty:
+                st.write(f"Kết quả crawl từ Shopee ({len(shopee_data)} sản phẩm):")
+                st.dataframe(shopee_data)
+            else:
+                st.warning("Không tìm thấy dữ liệu nào từ Shopee.")
+        except Exception as e:
+            st.error(f"Có lỗi xảy ra: {e}")
 
     # Social Media Crawl
     st.subheader("💬 Crawl từ Mạng Xã Hội")
     if st.button("Crawl Mạng Xã Hội"):
-        social_data = crawl_social_media(keyword=keyword, max_posts=50)
-        st.write(f"Kết quả crawl từ mạng xã hội ({len(social_data)} bài đăng):")
-        st.dataframe(social_data)
+        try:
+            social_data = crawl_social_media(keyword=keyword, max_posts=50)
+            st.write(f"Kết quả crawl từ mạng xã hội ({len(social_data)} bài đăng):")
+            st.dataframe(social_data)
+        except Exception as e:
+            st.error(f"Có lỗi xảy ra: {e}")
 
 # Page 2: Dự Đoán Xu Hướng
 if selected == "Dự Đoán Xu Hướng":
