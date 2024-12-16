@@ -53,7 +53,7 @@ def crawl_shopee(keyword="labubu", max_pages=1):
         driver.quit()
         return pd.DataFrame(product_data)
     except Exception as e:
-        st.warning("Không thể crawl dữ liệu Shopee. Chuyển sang dữ liệu mẫu.")
+        st.warning("Chuyển sang dữ liệu mẫu.")
         return pd.DataFrame({
             "Product": ["Labubu Doll 1", "Labubu Doll 2", "Labubu Doll 3"],
             "Sales": ["150 sold", "200 sold", "250 sold"]
