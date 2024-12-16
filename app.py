@@ -6,7 +6,6 @@ from sklearn.linear_model import LinearRegression
 from streamlit_option_menu import option_menu
 import requests
 from bs4 import BeautifulSoup
-import snscrape.modules.twitter as sntwitter
 
 # Streamlit configuration
 st.set_page_config(page_title="Labubu Trend Analysis", layout="wide")
@@ -46,14 +45,14 @@ def crawl_shopee(keyword="labubu", max_pages=1):
 
     return pd.DataFrame(product_data)
 
-# Function for crawling data from social media (Twitter)
+# Mock function for social media data
 def crawl_social_media(keyword="labubu", max_posts=50):
-    posts = []
-    for i, tweet in enumerate(sntwitter.TwitterSearchScraper(f"{keyword} lang:en").get_items()):
-        if i >= max_posts:
-            break
-        posts.append({"Post": tweet.content, "Likes": tweet.likeCount, "Comments": tweet.replyCount})
-    return pd.DataFrame(posts)
+    # Return mock data for now
+    return pd.DataFrame({
+        "Post": ["Labubu is amazing!", "Best gift for kids!", "Limited Labubu stocks!"],
+        "Likes": [150, 230, 300],
+        "Comments": [20, 35, 50]
+    })
 
 # Page 1: Crawl Data
 if selected == "Crawl Dữ Liệu":
